@@ -2,6 +2,7 @@
 use std;
 use std::iter::Iterator;
 use std::iter::IntoIterator;
+use std::ops::Mul;
 
 pub struct DenseVector {
     ns: std::vec::Vec<f64>,
@@ -29,6 +30,11 @@ impl DenseVector {
     pub fn from<T: IntoIterator<Item=f64>>(x: T) -> DenseVector {
         DenseVector::from_iter(x.into_iter())
     }
+
+    // Returns an iterator over the contained numbers
+    pub fn iter(&self) -> std::slice::Iter<f64> {
+        self.ns.iter()
+    }
 }
 
 impl IntoIterator for DenseVector {
@@ -54,6 +60,24 @@ impl std::ops::Index<usize> for DenseVector {
     }
 }
 
+impl std::cmp::PartialEq for DenseVector {
+    fn eq(&self, other: &DenseVector) -> bool {
+        let self_iter = self.iter();
+        let other_iter = other.iter();
+
+        self_iter.zip(other_iter).all(|(x, y)| x == y)
+    }
+}
+
+impl Mul<f64> for DenseVector {
+
+    type Output = DenseVector;
+
+    fn mul(self, rhs: f64) -> DenseVector {
+        DenseVector::from_iter(self.into_iter().map(|x| x * rhs))
+    }
+}
+
 #[cfg(test)]
 mod tests {
 
@@ -69,5 +93,14 @@ mod tests {
     fn test_indexing_a_non_set_entry() {
         let v = DenseVector::from(vec![3.0, 4.0]);
         assert_eq!(0.0, v[12]);
+    }
+
+    #[test]
+    fn multiply_rhs_f64() {
+        let v = DenseVector::from(vec![1.0, 2.0]);
+        let scaled = v * 3.0;
+        let expected = DenseVector::from(vec![3.0, 6.0]);
+
+        assert!(scaled == expected)
     }
 }
