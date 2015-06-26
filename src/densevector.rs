@@ -11,7 +11,7 @@ pub struct DenseVector {
 impl DenseVector {
 
     // Size of non-zero elements
-    fn size(&self) -> usize {
+    pub fn size(&self) -> usize {
        self.ns.len()
     }
 
@@ -56,6 +56,7 @@ impl std::ops::Index<usize> for DenseVector {
 
 #[cfg(test)]
 mod tests {
+
     use super::DenseVector;
 
     #[test]
