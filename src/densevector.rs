@@ -1,6 +1,7 @@
 
 use std;
 use std::iter::Iterator;
+use std::iter::IntoIterator;
 
 pub struct DenseVector {
     ns: std::vec::Vec<f64>,
@@ -15,12 +16,17 @@ impl DenseVector {
 
     // Euclidean length of the vector
     pub fn length(&self) -> f64 {
-        self.ns.iter().fold(0.0, |sum, x| sum + x).sqrt()
+        self.ns.iter().map(|x| x**x).fold(0.0, |sum, x| sum + x).sqrt()
     }
 
     // Creates a new instance from an iterator of real numbers
     pub fn from_iter<T: Iterator<Item=f64>>(iter: T) -> DenseVector {
         DenseVector { ns: iter.collect() }
+    }
+
+    // Creates a DenseVector from any iterable
+    pub fn from<T: IntoIterator<Item=f64>>(x: T) -> DenseVector {
+        DenseVector::from_iter(x.into_iter())
     }
 }
 
@@ -40,5 +46,16 @@ impl std::ops::Index<usize> for DenseVector {
 
     fn index(&self, index: usize) -> &f64 {
         &self.ns[index]
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::DenseVector;
+
+    #[test]
+    fn test_vector_length() {
+        let v = DenseVector::from(vec![3.0, 4.0]);
+        assert_eq!(5.0, v.length());
     }
 }
