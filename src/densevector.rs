@@ -2,8 +2,10 @@
 use std;
 use std::iter::IntoIterator;
 use std::ops::Mul;
+use std::ops::Add;
 
 /// A vector that stores its values in a contiguous indexed array internally.
+#[derive(Debug)]
 pub struct DenseVector {
     ns: std::vec::Vec<f64>,
 }
@@ -108,6 +110,19 @@ impl Mul for DenseVector {
     }
 }
 
+impl Add for DenseVector {
+    type Output = Result<DenseVector, Error>;
+
+    fn add(self, rhs: DenseVector) -> Result<DenseVector, Error> {
+        if self.size() != rhs.size() {
+            Err(Error::MismatchedVectorSizes)
+        } else {
+            let numbers = self.into_iter().zip(rhs.into_iter()).map(|(x, y)| x + y);
+            Ok(DenseVector::from_iter(numbers))
+        }
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -139,6 +154,16 @@ mod tests {
         let v3 = DenseVector::from(vec![150.4]);
 
         assert_eq!(Ok(127.0), v1.clone() * v2.clone());
+        assert_eq!(Err(Error::MismatchedVectorSizes), v2.clone() * v3.clone());
+    }
+
+    #[test]
+    fn test_addition() {
+        let v1 = DenseVector::from(vec![3.0, 4.0, 5.0]);
+        let v2 = DenseVector::from(vec![12.0, 14.0, 7.0]);
+        let v3 = DenseVector::from(vec![150.4]);
+
+        assert_eq!(Ok(DenseVector::from(vec![15.0, 18.0, 12.0])), v1.clone() + v2.clone());
         assert_eq!(Err(Error::MismatchedVectorSizes), v2.clone() * v3.clone());
     }
 }
