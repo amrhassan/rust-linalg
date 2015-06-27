@@ -2,3 +2,6 @@ language: rust
 rust:
   - nightly
   - stable
+
+after_success:
+  - curl -X POST -H "Github:amrhassan/rust-linalg" http://www.rustdox.com
