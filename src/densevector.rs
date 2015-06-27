@@ -5,6 +5,10 @@ use std::ops::Mul;
 use std::ops::Add;
 
 /// A vector that stores its values in a contiguous indexed array internally.
+///
+/// Instances of `DenseVector` can be scaled by being multiplied by a real value, added
+/// together using addition operator or multiplied "as in inner product" using the multiplication
+/// operator.
 #[derive(Debug)]
 pub struct DenseVector {
     ns: std::vec::Vec<f64>,
@@ -22,12 +26,12 @@ impl DenseVector {
         self.ns.iter().map(|x| x**x).fold(0.0, |sum, x| sum + x).sqrt()
     }
 
-    /// Creates a new instance from an iterator of real numbers
+    /// Constructs a new instance from an iterator of real numbers
     pub fn from_iter<T: std::iter::Iterator<Item=f64>>(iter: T) -> DenseVector {
         DenseVector { ns: iter.collect() }
     }
 
-    /// Creates a DenseVector from any iterable
+    /// Constructs a DenseVector from any iterable
     pub fn from<T: IntoIterator<Item=f64>>(x: T) -> DenseVector {
         DenseVector::from_iter(x.into_iter())
     }
@@ -82,6 +86,7 @@ impl Mul<f64> for DenseVector {
     }
 }
 
+/// Errors returned by this module
 #[derive(Debug, PartialEq)]
 pub enum Error {
     MismatchedVectorSizes,
