@@ -80,6 +80,11 @@ impl Mul<f64> for DenseVector {
     }
 }
 
+#[derive(Debug, PartialEq)]
+pub enum Error {
+    MismatchedVectorSizes,
+}
+
 impl Mul<DenseVector> for f64 {
 
     type Output = DenseVector;
@@ -89,11 +94,25 @@ impl Mul<DenseVector> for f64 {
     }
 }
 
+impl Mul for DenseVector {
+    type Output = Result<f64, Error>;
+
+    fn mul(self, rhs: DenseVector) -> Result<f64, Error> {
+        if self.size() != rhs.size() {
+            Err(Error::MismatchedVectorSizes)
+        } else {
+            let value =
+                self.iter().zip(rhs.iter()).map(|(x, y)| x * y).fold(0.0, |acc, x| acc + x);
+            Ok(value)
+        }
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
 
-    use super::DenseVector;
+    use super::{DenseVector, Error};
 
     #[test]
     fn test_vector_length() {
@@ -102,7 +121,7 @@ mod tests {
     }
 
     #[test]
-    fn multiply_rhs_f64() {
+    fn test_scaling_vectors() {
         let v1 = DenseVector::from(vec![1.0, 2.0]);
         let v2 = v1.clone();
         let scaled_rhs = v1 * 3.0;
@@ -111,5 +130,15 @@ mod tests {
 
         assert!(scaled_lhs == expected);
         assert!(scaled_rhs == expected)
+    }
+
+    #[test]
+    fn test_inner_product() {
+        let v1 = DenseVector::from(vec![3.0, 4.0, 5.0]);
+        let v2 = DenseVector::from(vec![12.0, 14.0, 7.0]);
+        let v3 = DenseVector::from(vec![150.4]);
+
+        assert_eq!(Ok(127.0), v1.clone() * v2.clone());
+        assert_eq!(Err(Error::MismatchedVectorSizes), v2.clone() * v3.clone());
     }
 }
