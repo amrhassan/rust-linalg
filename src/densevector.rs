@@ -1,6 +1,5 @@
 
 use std;
-use std::iter::Iterator;
 use std::iter::IntoIterator;
 use std::ops::Mul;
 
@@ -22,7 +21,7 @@ impl DenseVector {
     }
 
     // Creates a new instance from an iterator of real numbers
-    pub fn from_iter<T: Iterator<Item=f64>>(iter: T) -> DenseVector {
+    pub fn from_iter<T: std::iter::Iterator<Item=f64>>(iter: T) -> DenseVector {
         DenseVector { ns: iter.collect(), zero: 0.0 }
     }
 
@@ -34,6 +33,13 @@ impl DenseVector {
     // Returns an iterator over the contained numbers
     pub fn iter(&self) -> std::slice::Iter<f64> {
         self.ns.iter()
+    }
+}
+
+
+impl Clone for DenseVector {
+    fn clone(&self) -> DenseVector {
+        DenseVector::from_iter(self.iter().map(|x| *x))
     }
 }
 
@@ -78,6 +84,16 @@ impl Mul<f64> for DenseVector {
     }
 }
 
+impl Mul<DenseVector> for f64 {
+
+    type Output = DenseVector;
+
+    fn mul(self, rhs: DenseVector) -> DenseVector {
+        rhs * self
+    }
+}
+
+
 #[cfg(test)]
 mod tests {
 
@@ -97,10 +113,13 @@ mod tests {
 
     #[test]
     fn multiply_rhs_f64() {
-        let v = DenseVector::from(vec![1.0, 2.0]);
-        let scaled = v * 3.0;
+        let v1 = DenseVector::from(vec![1.0, 2.0]);
+        let v2 = v1.clone();
+        let scaled_rhs = v1 * 3.0;
+        let scaled_lhs = 3.0 * v2;
         let expected = DenseVector::from(vec![3.0, 6.0]);
 
-        assert!(scaled == expected)
+        assert!(scaled_lhs == expected);
+        assert!(scaled_rhs == expected)
     }
 }
