@@ -1,3 +1,7 @@
+env:
+  global:
+    - secure: Weql3AzgW5+Yrf+oY0YHJLr7ZqVbI207zJUbFRL4s28U01i/sx1s8udOQOlGHmsc0WIzWVv6+XDX5I2GcXNp8tb6xotTrHdFRznAIoauLUmfkmwMyYp3PFAXa6OXLBVQKxMNVc6ZDqgyTZmn0mn9zj5meWynKLXu3u2/+THoNxxE7Bp6szw/99401z0K10gxxs7b/yANB1f5eNWi6qMkpEvOLXuEOrZVkC7ydeT5kFbR8+mtjaRfCJxXCRZjI+tB1Zob7n4UFACvzlHBqtFomF5wefJ6HceYvXR4v/vx6P+kQ2efEgJDNqkiVNB1+zytZ6VzyaQOBlDNI2Z3tnAce/gopM/Pir1oz/nUduTLz5M/lyDUy145UtSB4ad0cLVOjz64BR9mrjaw8ojt2xnBNOKmcBaq/Qnr9TDDs9tABznQOLlmb44wWa8tjxSjO/Q0WFlvKCeQM84yUGbfB/rmnvtG/7npGBqK8loFSYvmaKGBP2xJEEu3NQhKGUcBs0H5zGD5Rw+IHWrL57mFP7FwUIvk2RY47TeuPb6uoURfpi8+ABg7jCJfKseoo2aPZguo7evRkM35akc1kTAlPHDvmcGDiaTwFV3j63wonWYQtci8G5ZkqgNSRwTcrxvs6gtQWg0nLaHHjm+vLMjKs1gx6dHNfxB4695fh5lNnhzXs8E=
+
 language: rust
 rust:
   - nightly
@@ -5,3 +9,4 @@ rust:
 
 after_success:
   - curl -X POST -H "Github:amrhassan/rust-linalg" http://www.rustdox.com
+  - curl http://www.rust-ci.org/artifacts/put?t=$RUSTCI_TOKEN | sh
