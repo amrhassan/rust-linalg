@@ -48,7 +48,7 @@ impl IntoIterator for DenseVector {
     type Item = f64;
     type IntoIter = std::vec::IntoIter<f64>;
 
-    fn into_iter(self) -> std::vec::IntoIter<f64> {
+    fn into_iter(self) -> Self::IntoIter {
         self.ns.into_iter()
     }
 }
@@ -57,7 +57,7 @@ impl std::ops::Index<usize> for DenseVector {
 
     type Output = f64;
 
-    fn index(&self, index: usize) -> &f64 {
+    fn index(&self, index: usize) -> &Self::Output {
         &self.ns[index]
     }
 }
@@ -75,7 +75,7 @@ impl Mul<f64> for DenseVector {
 
     type Output = DenseVector;
 
-    fn mul(self, rhs: f64) -> DenseVector {
+    fn mul(self, rhs: f64) -> Self::Output {
         DenseVector::from_iter(self.into_iter().map(|x| x * rhs))
     }
 }
@@ -89,7 +89,7 @@ impl Mul<DenseVector> for f64 {
 
     type Output = DenseVector;
 
-    fn mul(self, rhs: DenseVector) -> DenseVector {
+    fn mul(self, rhs: DenseVector) -> Self::Output {
         rhs * self
     }
 }
@@ -97,7 +97,7 @@ impl Mul<DenseVector> for f64 {
 impl Mul for DenseVector {
     type Output = Result<f64, Error>;
 
-    fn mul(self, rhs: DenseVector) -> Result<f64, Error> {
+    fn mul(self, rhs: DenseVector) -> Self::Output {
         if self.size() != rhs.size() {
             Err(Error::MismatchedVectorSizes)
         } else {
