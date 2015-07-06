@@ -3,6 +3,8 @@ use std;
 use std::iter::IntoIterator;
 use std::ops::Mul;
 use std::ops::Add;
+use densematrix;
+use densematrix::DenseMatrix;
 
 /// A vector that stores its values in a contiguous indexed array internally.
 ///
@@ -40,8 +42,17 @@ impl DenseVector {
     pub fn iter(&self) -> std::slice::Iter<f64> {
         self.ns.iter()
     }
-}
 
+    /// Transforms into a single-column DenseMatrix
+    pub fn into_matrix(self) -> DenseMatrix {
+        DenseMatrix::from_vector(self)
+    }
+
+    pub fn into_shaped_matrix(self, rows: usize, cols: usize)
+        -> Result<DenseMatrix, densematrix::Error> {
+        DenseMatrix::from_shaped_vector(self, rows, cols)
+    }
+}
 
 impl Clone for DenseVector {
     fn clone(&self) -> DenseVector {
