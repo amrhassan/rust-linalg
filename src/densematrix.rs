@@ -115,9 +115,12 @@ mod test {
             10.0, 11.0, 12.0
         ].into_iter(), 4, 3).unwrap();
 
-        assert!(matrix.row(0).unwrap() == DenseVector::from_iter(vec![1.0, 2.0, 3.0].into_iter()));
-        assert!(matrix.row(1).unwrap() == DenseVector::from_iter(vec![4.0, 5.0, 6.0].into_iter()));
-        assert!(matrix.row(2).unwrap() == DenseVector::from_iter(vec![7.0, 8.0, 9.0].into_iter()));
+        assert_eq!(matrix.row(0).unwrap(),
+            DenseVector::from_iter(vec![1.0, 2.0, 3.0].into_iter()));
+        assert_eq!(matrix.row(1).unwrap(),
+            DenseVector::from_iter(vec![4.0, 5.0, 6.0].into_iter()));
+        assert_eq!(matrix.row(2).unwrap(),
+            DenseVector::from_iter(vec![7.0, 8.0, 9.0].into_iter()));
     }
 
     #[test]
@@ -129,8 +132,11 @@ mod test {
             10.0, 11.0, 12.0
         ].into_iter(), 4, 3).unwrap();
 
-        assert_eq!(matrix.col(0).unwrap(), DenseVector::from_iter(vec![1.0, 4.0, 7.0, 10.0].into_iter()));
-        assert_eq!(matrix.col(1).unwrap(), DenseVector::from_iter(vec![2.0, 5.0, 8.0, 11.0].into_iter()));
-        assert_eq!(matrix.col(2).unwrap(), DenseVector::from_iter(vec![3.0, 6.0, 9.0, 12.0].into_iter()));
+        assert_eq!(matrix.col(0).unwrap(),
+            DenseVector::from_iter(vec![1.0, 4.0, 7.0, 10.0].into_iter()));
+        assert_eq!(matrix.col(1).unwrap(),
+            DenseVector::from_iter(vec![2.0, 5.0, 8.0, 11.0].into_iter()));
+        assert_eq!(matrix.col(2).unwrap(),
+            DenseVector::from_iter(vec![3.0, 6.0, 9.0, 12.0].into_iter()));
     }
 }
