@@ -16,6 +16,9 @@ pub enum Error {
 
     /// Input iterator doesn't provide a size hint
     UnsizedIterator,
+
+    RowOutOfBounds,
+    ColumnOutOfBounds,
 }
 
 impl DenseMatrix {
@@ -26,12 +29,12 @@ impl DenseMatrix {
         DenseMatrix::from_iter(vec.into_iter(), rows, 1).unwrap()
     }
 
-    /// Constructs a matrix out of the given vector, filling the columns first
+    /// Constructs a matrix out of the given vector, filling the rows first
     pub fn from_shaped_vector(vec: DenseVector, rows: usize, cols: usize) -> Result<DenseMatrix, Error> {
         DenseMatrix::from_iter(vec.into_iter(), rows, cols)
     }
 
-    /// Constructs a matrix out of the given iterator of numbers, filling the columns first
+    /// Constructs a matrix out of the given iterator of numbers, filling the rows first
     pub fn from_iter<T: Iterator<Item=f64>>(iterator: T, rows: usize, cols: usize) -> Result<DenseMatrix, Error> {
 
         let iterator_size = iterator.size_hint().1;
@@ -46,11 +49,88 @@ impl DenseMatrix {
         }
     }
 
+    /// Matrix row count
     pub fn rows(&self) -> usize {
         self.rows
     }
 
+    /// Matrix column count
     pub fn cols(&self) -> usize {
         self.cols
+    }
+
+    /// Extracts a single row as a vector
+    pub fn row(&self, i: usize) -> Result<DenseVector, Error> {
+       if i < self.rows() {
+            let row_size = self.cols();
+            let numbers = self.ns.iter()
+                .skip(i * row_size)
+                .take(row_size)
+                .map(|x| x.clone());
+            Ok(DenseVector::from_iter(numbers))
+        } else {
+            Err(Error::RowOutOfBounds)
+        }
+    }
+
+    /// Extracts a single column as a vector
+    pub fn col(&self, i: usize) -> Result<DenseVector, Error> {
+        if i < self.cols() {
+            let row_size = self.cols();
+            let numbers = self.ns.iter()
+                .enumerate()
+                .filter(|&(index, _)| (index % row_size) == i)
+                .map(|pair| pair.1.clone());
+            Ok(DenseVector::from_iter(numbers))
+        } else {
+            Err(Error::ColumnOutOfBounds)
+        }
+    }
+}
+
+
+#[cfg(test)]
+mod test {
+
+    use densematrix::DenseMatrix;
+    use densevector::DenseVector;
+
+    #[test]
+    fn it_works() {
+        let matrix = DenseMatrix::from_iter(vec![
+            1.0, 2.0, 3.0,
+            4.0, 5.0, 6.0,
+            7.0, 8.0, 9.0,
+            10.0, 11.0, 12.0
+        ].into_iter(), 4, 3).unwrap();
+        assert!(matrix.rows() == 4);
+    }
+
+    #[test]
+    fn extracting_rows() {
+        let matrix = DenseMatrix::from_iter(vec![
+            1.0, 2.0, 3.0,
+            4.0, 5.0, 6.0,
+            7.0, 8.0, 9.0,
+            10.0, 11.0, 12.0
+        ].into_iter(), 4, 3).unwrap();
+
+        assert!(matrix.row(0).unwrap() == DenseVector::from_iter(vec![1.0, 2.0, 3.0].into_iter()));
+        assert!(matrix.row(1).unwrap() == DenseVector::from_iter(vec![4.0, 5.0, 6.0].into_iter()));
+        assert!(matrix.row(2).unwrap() == DenseVector::from_iter(vec![7.0, 8.0, 9.0].into_iter()));
+    }
+
+    #[test]
+    fn extracting_cols() {
+        let matrix = DenseMatrix::from_iter(vec![
+            1.0, 2.0, 3.0,
+            4.0, 5.0, 6.0,
+            7.0, 8.0, 9.0,
+            10.0, 11.0, 12.0
+        ].into_iter(), 4, 3).unwrap();
+
+        assert_eq!(matrix.col(0).unwrap(), DenseVector::from_iter(vec![1.0, 4.0, 7.0, 10.0].into_iter()));
+        assert_eq!(matrix.col(1).unwrap(), DenseVector::from_iter(vec![2.0, 5.0, 8.0, 11.0].into_iter()));
+        assert_eq!(matrix.col(2).unwrap(), DenseVector::from_iter(vec![3.0, 6.0, 9.0, 12.0].into_iter()));
     }
 }
