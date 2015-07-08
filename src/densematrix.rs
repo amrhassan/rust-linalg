@@ -50,19 +50,19 @@ impl DenseMatrix {
     }
 
     /// Matrix row count
-    pub fn rows(&self) -> usize {
+    pub fn row_count(&self) -> usize {
         self.rows
     }
 
     /// Matrix column count
-    pub fn cols(&self) -> usize {
+    pub fn column_count(&self) -> usize {
         self.cols
     }
 
     /// Extracts a single row as a vector
     pub fn row(&self, i: usize) -> Result<DenseVector, Error> {
-       if i < self.rows() {
-            let row_size = self.cols();
+       if i < self.row_count() {
+            let row_size = self.column_count();
             let numbers = self.ns.iter()
                 .skip(i * row_size)
                 .take(row_size)
@@ -75,8 +75,8 @@ impl DenseMatrix {
 
     /// Extracts a single column as a vector
     pub fn col(&self, i: usize) -> Result<DenseVector, Error> {
-        if i < self.cols() {
-            let row_size = self.cols();
+        if i < self.column_count() {
+            let row_size = self.column_count();
             let numbers = self.ns.iter()
                 .enumerate()
                 .filter(|&(index, _)| (index % row_size) == i)
@@ -103,7 +103,7 @@ mod test {
             7.0, 8.0, 9.0,
             10.0, 11.0, 12.0
         ].into_iter(), 4, 3).unwrap();
-        assert!(matrix.rows() == 4);
+        assert!(matrix.row_count() == 4);
     }
 
     #[test]
