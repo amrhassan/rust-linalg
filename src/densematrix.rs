@@ -1,6 +1,7 @@
 
 use std;
 use densevector::DenseVector;
+use std::iter::Iterator;
 
 pub struct DenseMatrix {
     ns: std::vec::Vec<f64>,
@@ -66,10 +67,19 @@ impl DenseMatrix {
             let numbers = self.ns.iter()
                 .skip(i * row_size)
                 .take(row_size)
-                .map(|x| x.clone());
+                .map(|&x| x);
             Ok(DenseVector::from_iter(numbers))
         } else {
             Err(Error::RowOutOfBounds)
+        }
+    }
+
+    pub fn rows(&self) -> RowIterator {
+        RowIterator {
+            ns: &self.ns,
+            next_index: 0,
+            row_count: self.row_count(),
+            row_size: self.column_count(),
         }
     }
 
@@ -91,6 +101,50 @@ impl DenseMatrix {
         let rows = self.row_count();
         let cols = self.column_count();
         DenseMatrix::from_iter(self.ns.into_iter(), cols, rows).unwrap()
+    }
+}
+
+impl std::ops::Mul for DenseMatrix {
+
+    type Output = Result<Error, DenseMatrix>;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        panic!("NotImplemented")
+    }
+}
+
+pub struct RowIterator<'a> {
+    next_index: usize,
+    ns: &'a Vec<f64>,
+    row_count: usize,
+    row_size: usize,
+}
+
+impl<'a> Iterator for RowIterator<'a> {
+    type Item = DenseVector;
+
+    fn next(&mut self) -> Option<Self::Item> {
+       if self.next_index >= self.row_count {
+           None
+       } else {
+           let next_index = self.next_index;
+           self.next_index += 1;
+           let vector_numbers = self.ns.iter()
+                .skip(next_index * self.row_size)
+                .take(self.row_size)
+                .map(|&x| x);
+           Some(DenseVector::from_iter(vector_numbers))
+       }
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (self.row_count, Some(self.row_count))
+    }
+}
+
+impl<'a> ExactSizeIterator for RowIterator<'a> {
+    fn len(&self) -> usize {
+        self.row_count
     }
 }
 
