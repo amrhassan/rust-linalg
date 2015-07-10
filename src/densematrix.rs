@@ -86,6 +86,12 @@ impl DenseMatrix {
             Err(Error::ColumnOutOfBounds)
         }
     }
+
+    pub fn transpose(self) -> DenseMatrix {
+        let rows = self.row_count();
+        let cols = self.column_count();
+        DenseMatrix::from_iter(self.ns.into_iter(), cols, rows).unwrap()
+    }
 }
 
 
